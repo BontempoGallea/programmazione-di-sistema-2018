@@ -86,6 +86,8 @@
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.DirectoryServices.Protocols" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
@@ -111,10 +113,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> b6392adda2ee89b8277b49922055920c9023644f
     <Compile Include="Client.cs" />
     <Compile Include="ConfermWIndow.cs">
       <SubType>Form</SubType>
@@ -123,27 +121,6 @@
       <DependentUpon>ConfermWIndow.cs</DependentUpon>
     </Compile>
     <Compile Include="ListUserHandler.cs" />
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> b6392adda2ee89b8277b49922055920c9023644f
-=======
->>>>>>> b6392adda2ee89b8277b49922055920c9023644f
-    <Compile Include="finestraserver.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="finestraserver.Designer.cs">
-      <DependentUpon>finestraserver.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ListViewExtender.cs" />
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> origin/gianpao
-=======
->>>>>>> b6392adda2ee89b8277b49922055920c9023644f
-=======
->>>>>>> b6392adda2ee89b8277b49922055920c9023644f
     <Compile Include="SendFile.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -169,24 +146,8 @@
     <EmbeddedResource Include="ApplicazioneCondivisione.resx">
       <DependentUpon>ApplicazioneCondivisione.cs</DependentUpon>
     </EmbeddedResource>
-<<<<<<< HEAD
-<<<<<<< HEAD
     <EmbeddedResource Include="ConfermWIndow.resx">
       <DependentUpon>ConfermWIndow.cs</DependentUpon>
-=======
-    <EmbeddedResource Include="finestraserver.resx">
-      <DependentUpon>finestraserver.cs</DependentUpon>
->>>>>>> origin/gianpao
-=======
-    <EmbeddedResource Include="ConfermWIndow.resx">
-      <DependentUpon>ConfermWIndow.cs</DependentUpon>
-    <EmbeddedResource Include="finestraserver.resx">
-      <DependentUpon>finestraserver.cs</DependentUpon>
-
-<<<<<<< HEAD
->>>>>>> b6392adda2ee89b8277b49922055920c9023644f
-=======
->>>>>>> b6392adda2ee89b8277b49922055920c9023644f
     </EmbeddedResource>
     <EmbeddedResource Include="SendFile.resx">
       <DependentUpon>SendFile.cs</DependentUpon>

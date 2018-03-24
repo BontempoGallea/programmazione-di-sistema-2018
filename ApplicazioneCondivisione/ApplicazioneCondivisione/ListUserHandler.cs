@@ -37,22 +37,10 @@ namespace ApplicazioneCondivisione
             {
                 users = new Dictionary<string, Person>(); //creo una dictionary di persone
                 lastRefresh = -1;
-<<<<<<< HEAD
-<<<<<<< HEAD
-                string name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName; // Nome dell'utente che ha effettuato l'accesso
-                string[] st = name.Split(' ');
-                admin = new Person(st[0], st[1], "online", getLocalIPAddress(), "3000"); //imposto admin
-=======
-=======
->>>>>>> b6392adda2ee89b8277b49922055920c9023644f
                 //string name = System.DirectoryServices.AccountManagement.UserPrincipal.Current.DisplayName; // Nome dell'utente che ha effettuato l'accesso
                 string name = "gianpaolo bontempo";
                 string[] st = name.Split(' ');
-                admin = new Person("host2", st[1], "online", getLocalIPAddress(), "3000"); //imposto admin
-<<<<<<< HEAD
->>>>>>> b6392adda2ee89b8277b49922055920c9023644f
-=======
->>>>>>> b6392adda2ee89b8277b49922055920c9023644f
+                admin = new Person("n1", st[1], "online", getLocalIPAddress(), "3000"); //imposto admin
             }
             catch(Exception e) { }
             // Persone aggiunte per test
