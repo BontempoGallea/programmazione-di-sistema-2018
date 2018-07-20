@@ -174,7 +174,7 @@ namespace ApplicazioneCondivisione
 
                 foreach(MetroFramework.Controls.MetroTile m in selectedList)
                 {
-                    Thread clientThread = new Thread(() => Program.client.entryPoint(m.Name)) { Name = "clientThread" }; // Per ogni bottone selezionato creo un thread
+                    Thread clientThread = new Thread(() => Program.client.EntryPoint(m.Name)) { Name = "clientThread" }; // Per ogni bottone selezionato creo un thread
                     clientThread.Start();
                     clientThread.Join();
 

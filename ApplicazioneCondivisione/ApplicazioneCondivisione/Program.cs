@@ -68,7 +68,7 @@ namespace ApplicazioneCondivisione
 
                 // Creo la classe server che verrà fatta girare nel rispettivo thread
                 server = new Server();
-                serverThread = new Thread(server.entryPoint) { Name = "serverThread" };
+                serverThread = new Thread(server.EntryPoint) { Name = "serverThread" };
                 serverThread.Start();
 
                 // Avvio l'applicazione
