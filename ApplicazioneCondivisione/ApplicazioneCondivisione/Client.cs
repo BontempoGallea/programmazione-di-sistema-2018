@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
@@ -16,134 +14,65 @@ namespace ApplicazioneCondivisione
         /*
          * Classe che gestirà le tasks del client
         */
-        public void entryPoint(string user)
+        public void EntryPoint(string user)
         {
             // Ottengo indirizzo ip e porta della persona a cui voglio inviare il file
-            string[] cred = user.Split(',');
-            Person p = new Person();
-            
+            var cred = user.Split(',');
+            var p = new Person();
             Program.luh.getList().TryGetValue(cred[1] + cred[0], out p);
-
             if (p.isOnline())
                 SendFileTo(cred[2], cred[3]);
             else
                 MessageBox.Show("La persona a cui vuoi inviare non è più online!");
         }
 
+        private static bool IsDir(string fileName)
+        {
+            return (File.GetAttributes(fileName) & FileAttributes.Directory) == FileAttributes.Directory;
+        }
+
         private static void SendFileTo(string ip, string port)
         {
+            
             try
             {
-                
-                // Stabilisce l'endpoint locale per il socket
-                IPHostEntry ipHost = Dns.GetHostEntry(Dns.GetHostName());
-                IPAddress ipAddr = ipHost.AddressList[0];
-                IPEndPoint ipEndPoint = new IPEndPoint(IPAddress.Parse(ip), int.Parse(port));
-                bool isDIr = false;
+                var fileName = Program.pathSend;
+                var ipEndPoint = new IPEndPoint(IPAddress.Parse(ip), int.Parse(port));
                 // Crea un TCP socket.
-                Socket client = new Socket(AddressFamily.InterNetwork,
-                        SocketType.Stream, ProtocolType.Tcp);
-
+                var client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 // Connette il socket all'endpoint remoto
                 client.Connect(ipEndPoint);
-
                 // Manda fileName all'host remoto
-                if ((File.GetAttributes(Program.pathSend) & FileAttributes.Directory) == FileAttributes.Directory)
+                if (IsDir(fileName))
                 {
-                    isDIr = true;
-                }
-                if (isDIr)
-                {
-                    string fileName = Program.pathSend; // Prendo il primo path
-                    string ZipPath = fileName + ".zip";
-                    //Program.pathSend = string.Empty;
-                    byte[] ansbyte = new byte[1024];
-                    byte[] richbyte = new byte[1024];
-                    string richiesta = String.Format(Program.luh.getAdmin().getName() + "," + fileName + ",cartella", Environment.NewLine); // Stringa per avvisare chi sono, se lui mi accetta io mando il file
-                    //ansbyte = Encoding.ASCII.GetBytes("");
-                    richbyte = Encoding.ASCII.GetBytes(richiesta);
-                    client.SendBufferSize = richbyte.Length;
-                    client.ReceiveBufferSize = 1024;
-                    client.Send(richbyte);
-
-                    client.Receive(ansbyte);
-                    string confermed = ASCIIEncoding.ASCII.GetString(ansbyte);
-
-                    // Creo prebuffer e postbuffer per scrivere all'inizio e alla fine del file
-                    if (confermed.CompareTo("ok") == 0)
+                    var richiesta = String.Format(Program.luh.getAdmin().getName() + "," + fileName + ",cartella", Environment.NewLine); // Stringa per avvisare chi sono, se lui mi accetta io mando il file
+                    SendHeader(richiesta, client);
+                    if (String.Compare(ReceiveResponse(client), "ok", StringComparison.Ordinal) == 0)
                     {
-                        string string1 = String.Format(""); // Modifico qua se voglio aggiungere qualcosa prima del file
-                        byte[] preBuf = new byte[1024];
-                        preBuf = Encoding.ASCII.GetBytes(string1);
-
-                        string string2 = String.Format(""); // Modifico qua se voglio aggiungere qualcosa dopo il file
-                        byte[] postBuf = new byte[1024];
-                        postBuf = Encoding.ASCII.GetBytes(string2);
-                        ZipFile.CreateFromDirectory(fileName, ZipPath);
-                        // Mando fileName con i buffers e i flag di default all'endpoint remoto
-                        client.SendFile(ZipPath, preBuf, postBuf, TransmitFileOptions.UseDefaultWorkerThread);
-                        File.Delete(ZipPath);
+                        var zipPath = fileName + ".zip";
+                        ZipFile.CreateFromDirectory(fileName, zipPath);
+                        SendFileOnNet(client,"","",zipPath);
+                        File.Delete(zipPath);
+                        var ansbyte = new byte[1024];
                         client.Receive(ansbyte);
-                        if (Program.AnnullaBoolean)
-                        {
-                            preBuf = Encoding.ASCII.GetBytes("annulla");
-                            client.Send(preBuf);
-                        }
-                        else
-                        {
-                            preBuf = Encoding.ASCII.GetBytes("fine");
-                            client.Send(preBuf);
-                        }
-                        // Faccio il free del socket
-                        client.Shutdown(SocketShutdown.Both);
-                        client.Close();
+                        SendHeader(Program.AnnullaBoolean ? "annulla" : "fine", client);
                     }
                 }
                 else
                 {
-                    string fileName = Program.pathSend; // Prendo il primo path
-                    //Program.pathSend = string.Empty;
-                    byte[] ansbyte = new byte[1024];
-                    byte[] richbyte = new byte[1024];
-                    string richiesta = String.Format(Program.luh.getAdmin().getName() + "," + fileName + ",file", Environment.NewLine); // Stringa per avvisare chi sono, se lui mi accetta io mando il file
-                    //ansbyte = Encoding.ASCII.GetBytes("");
-                    richbyte = Encoding.ASCII.GetBytes(richiesta);
-                    client.SendBufferSize = richbyte.Length;
-                    client.ReceiveBufferSize = 1024;
-                    client.Send(richbyte);
-
-                    client.Receive(ansbyte);
-                    string confermed = ASCIIEncoding.ASCII.GetString(ansbyte);
-
+                    var richiesta = String.Format(Program.luh.getAdmin().getName() + "," + fileName + ",file", Environment.NewLine); // Stringa per avvisare chi sono, se lui mi accetta io mando il file
+                    SendHeader(richiesta,client);
                     // Creo prebuffer e postbuffer per scrivere all'inizio e alla fine del file
-                    if (confermed.CompareTo("ok") == 0)
+                    if (String.Compare(ReceiveResponse(client), "ok", StringComparison.Ordinal) == 0)
                     {
-                        string string1 = String.Format(""); // Modifico qua se voglio aggiungere qualcosa prima del file
-                        byte[] preBuf = new byte[1024];
-                        preBuf = Encoding.ASCII.GetBytes(string1);
-
-                        string string2 = String.Format(""); // Modifico qua se voglio aggiungere qualcosa dopo il file
-                        byte[] postBuf = new byte[1024];
-                        postBuf = Encoding.ASCII.GetBytes(string2);
-
-                        // Mando fileName con i buffers e i flag di default all'endpoint remoto
-                        client.SendFile(fileName, preBuf, postBuf, TransmitFileOptions.UseDefaultWorkerThread);
+                        SendFileOnNet(client,"","",fileName);
+                        var ansbyte = new byte[1024];
                         client.Receive(ansbyte);
-                        if (Program.AnnullaBoolean)
-                        {
-                            preBuf = Encoding.ASCII.GetBytes("annulla");
-                            client.Send(preBuf);
-                        }
-                        else
-                        {
-                            preBuf = Encoding.ASCII.GetBytes("fine");
-                            client.Send(preBuf);
-                        }
-                        // Faccio il free del socket
-                        client.Shutdown(SocketShutdown.Both);
-                        client.Close();
+                        SendHeader(Program.AnnullaBoolean ? "annulla" : "fine", client);
                     }
                 }
+                client.Shutdown(SocketShutdown.Both);
+                client.Close();
             }
             catch (ArgumentNullException e) { }
             catch (EncoderFallbackException e) { }
@@ -157,6 +86,31 @@ namespace ApplicazioneCondivisione
             catch(PathTooLongException e) { }
             catch(IOException e) { }
             catch(UnauthorizedAccessException e) { }
+        }
+
+        private static void SendFileOnNet(Socket client,string pre,string post, string zipPath)
+        {
+            var string1 = String.Format(pre); // Modifico qua se voglio aggiungere qualcosa prima del file
+            var preBuf = Encoding.ASCII.GetBytes(string1);
+            var string2 = String.Format(post); // Modifico qua se voglio aggiungere qualcosa dopo il file
+            var postBuf = Encoding.ASCII.GetBytes(string2);
+            client.SendFile(zipPath, preBuf, postBuf, TransmitFileOptions.UseDefaultWorkerThread);
+        }
+
+        private static string ReceiveResponse(Socket client)
+        {
+            var ansbyte = new byte[1024];
+            client.ReceiveBufferSize = 1024;
+            client.Receive(ansbyte);
+            return Encoding.ASCII.GetString(ansbyte);
+        }
+
+        private static void SendHeader(string richiesta, Socket client)
+        {
+            var richbyte = Encoding.ASCII.GetBytes(richiesta);
+            client.SendBufferSize = richbyte.Length;
+            client.ReceiveBufferSize = 1024;
+            client.Send(richbyte);
         }
     }
 }
